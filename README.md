@@ -6,3 +6,4 @@
 - 边框发光特效
 - 切换动画
 - 双击操作，拖拽操作，滚轮操作
+![avatar](https://github.com/songjt1993/QMLPrettyUI/blob/master/resources/ReadMeImage/image_browser.png)
