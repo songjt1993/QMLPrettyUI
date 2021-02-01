@@ -11,21 +11,70 @@ class QMLLineChart(QQuickWidget):
         super(QMLLineChart, self).__init__(QUrl("./Chart/LineChart.qml"), parent=parent)
         self.setResizeMode(self.SizeRootObjectToView)
         self.rootObject().setProperty("titleText", title)
+
+        self.down_sampling = True
+        self.step = 4
+        self.level = 3
+        self.max_point = 8
+        self.points = {}
     
     def add_series(self, name, color, line_width):
         self.rootObject().addSeries(name, "lineSeries", color, line_width)
-    
+        self.points[name] = []
+        if self.down_sampling:
+            for i in range(self.level):
+                self.points[name].append([])
+
     def add_points(self, name, points):
-        self.rootObject().addPoints(name, points)
-        
+        self.points[name][0].extend(points)
+        if self.down_sampling:
+            # 降采样
+            levels = self.points[name]
+            for i in range(len(levels)-1):
+                border = len(levels[i + 1]) // 2 * self.step
+                for j in range(border, len(levels[i]), self.step):
+                    if j + self.step <= len(levels[i]):
+                        levels[i + 1].extend(self.sample(levels[i][j:j + self.step]))
+            # print(levels)
+            # 获取更新点
+            self.rootObject().replacePoints(name, self.get_series(name))
+        else:
+            self.rootObject().replacePoints(name, self.points[name][1])
     
     def set_xrange(self, x_min, x_max):
         self.rootObject().setProperty("xRange", QVariant([x_min, x_max]))
         self.rootObject().clearCanvas()
 
+    @staticmethod
+    def sample(bucket):
+        p1, p2 = bucket[0], bucket[0]
+        for p in bucket:
+            if p.y() > p1.y():
+                p1 = p
+            if p.y() < p2.y():
+                p2 = p
+        if p1.x() > p2.x():
+            return [p2, p1]
+        else:
+            return [p1, p2]
+
+    def get_series(self, name):
+        for i, points in enumerate(self.points[name]):
+            if i == 0:
+                if len(points) < self.max_point:
+                    return points
+                else:
+                    continue
+
+            if len(points) < self.max_point:
+                return points + self.points[name][0][len(points) // 2 * (self.step//2) ** i:]
+        i, points = len(self.points[name]) - 1, self.points[name][-1]
+        return points + self.points[name][0][len(points) // 2 * (self.step // 2) ** i:]
+
+
 
 CHARTS = []
-init_cnt = 6000
+init_cnt = 40
 total = init_cnt // 2 * 3
 r = 3
 c = 4

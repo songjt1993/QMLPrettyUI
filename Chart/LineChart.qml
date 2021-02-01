@@ -114,8 +114,14 @@ Rectangle {
         obj.requestPaint()
     }
 
+    function replacePoints(series, points) {
+        var obj = dynamicObjects[series]
+        obj.points = points
+        obj.requestPaint()
+    }
+
     function addSeries(series, type, color, lineWidth) {
-        if (type="lineSeries") {
+        if (type=="lineSeries") {
             var component = Qt.createComponent("LineSeries.qml")
             if (component.status == Component.Ready) {
                 dynamicObjects[series] = component.createObject(root, {"color": color, "lineWidth": lineWidth, "name":series})

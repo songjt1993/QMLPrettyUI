@@ -12,14 +12,14 @@ Canvas {
     property var color: "black"
     property var lineWidth: 2
     property var name: ""
-    property var downSamplingInterval: 1;
+    property var downSamplingInterval: 1
     onPaint: {
         draw()
     }
 
     function draw() {
         var tstamp=new Date().getTime()
-//        console.log(x,y,"7777")
+//        console.log(points.length)
         if (points.length >= 2) {
             var ctx = getContext("2d")
             ctx.clearRect(0,0,width,height)
