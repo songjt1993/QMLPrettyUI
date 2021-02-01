@@ -15,6 +15,8 @@ Rectangle {
     property var xTickStrategy: [0, 100, 10] // 锚点，最小间隔，tick数量
     property var yTickStrategy: [0, 300, 3]
     property var dynamicObjects: new Object()
+    property var zoomFactorX: []
+    property var zoomFactorY: []
 
     Text {
         id: title
@@ -80,17 +82,30 @@ Rectangle {
     }
 
     onXRangeChanged: {
+        zoomFactorX = calZoomFactorX()
         root.xTick = adjustTick(root.xTickStrategy, root.xRange)
     }
 
     onYRangeChanged: {
+        zoomFactorY = calZoomFactorY()
         root.yTick = adjustTick(root.yTickStrategy, root.yRange)
     }
 
+    function calZoomFactorX() {
+        var f = plotArea.width / (xRange[1] - xRange[0])
+        return [f, plotArea.left-f*xRange[0]]
+    }
+
+    function calZoomFactorY() {
+        var f = plotArea.height / (yRange[1] - yRange[0])
+        return [-f, plotArea.bottom-f*yRange[0]]
+    }
+
     function mapToPosition(x, y) {
-        var posX = plotArea.left + (x-xRange[0]) / (xRange[1] - xRange[0]) * plotArea.width
-        var posY = plotArea.bottom - (y-yRange[0]) / (yRange[1] - yRange[0]) * plotArea.height
-        return [posX.toFixed(), posY.toFixed()]
+        var posX = x * zoomFactorX[0] + zoomFactorX[1]
+        var posY = y * zoomFactorY[0] + zoomFactorY[1]
+//        console.log(zoomFactorX, zoomFactorY)
+        return [posX, posY]
     }
 
     function addPoints(series, points) {
@@ -116,7 +131,7 @@ Rectangle {
         for (var series in dynamicObjects) {
             var cvs = dynamicObjects[series]
             cvs.markDirty(Qt.rect(0, 0, cvs.width, cvs.height))
-            console.log(Qt.rect(0, 0, cvs.width, cvs.height))
+//            console.log(Qt.rect(0, 0, cvs.width, cvs.height))
         }
     }
 

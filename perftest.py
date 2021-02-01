@@ -21,13 +21,14 @@ class QMLLineChart(QQuickWidget):
     
     def set_xrange(self, x_min, x_max):
         self.rootObject().setProperty("xRange", QVariant([x_min, x_max]))
+        self.rootObject().clearCanvas()
 
 
 CHARTS = []
-total = 3000
-init_cnt = 2000
-r = 5
-c = 2
+init_cnt = 6000
+total = init_cnt // 2 * 3
+r = 3
+c = 4
 
 def generate_points(n, x_range, y_range):
     points = []
@@ -55,7 +56,7 @@ def timeout_slot():
         for i in range(5):
             wgt.add_points("line {}".format(i+1), generate_points(1, (init_cnt/total*1000, (init_cnt+1)/total*1000), (i*200, (i+1)*200)))
         init_cnt += 1
-    print("更新{}点耗时：{}".format("", time.time()-st))
+    print("更新{}点耗时：{}".format(init_cnt, time.time()-st))
 
 def set_range(v):
     for wgt in CHARTS:
