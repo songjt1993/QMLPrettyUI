@@ -36,7 +36,7 @@ Canvas {
             }
             ctx.stroke()
         }
-        console.log("ms", new Date().getTime() - tstamp)
+//        console.log("ms", new Date().getTime() - tstamp)
     }
 
     function mapToPosition(x, y) {
