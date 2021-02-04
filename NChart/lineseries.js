@@ -29,5 +29,5 @@ function color(){
      var r = Math.floor(Math.random()*255);
      var g = Math.floor(Math.random()*255);
      var b = Math.floor(Math.random()*255);
-     return 'rgba('+ r +','+ g +','+ b +',0.8)'
+     return "#"+r.toString(16).padStart(2,"0") + g.toString(16).padStart(2,"0") + b.toString(16).padStart(2,"0")//'rgba('+ r +','+ g +','+ b +',0.8)'
 }

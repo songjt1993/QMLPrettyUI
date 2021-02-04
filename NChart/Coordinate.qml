@@ -1,7 +1,7 @@
 import QtQuick 2.15
 
 Canvas {
-    property var padding: {"top":15, "left":15, "bottom": 15, "right": 15}
+    property var padding: {"top":30, "left":30, "bottom": 30, "right": 30}
     property var plotArea: Qt.rect(padding.left, padding.top, width-padding.left-padding.right, height-padding.top-padding.bottom)
     property var topAxis: null
     property var bottomAxis: null
@@ -14,6 +14,11 @@ Canvas {
         if (leftAxis) leftAxis.draw(ctx, plotArea)
         if (rightAxis) rightAxis.draw(ctx, plotArea)
     }
+    // 坐标轴名字
+    Text {text: axisName(topAxis);visible: true;anchors.top:parent.top; anchors.horizontalCenter:parent.horizontalCenter}
+    Text {text: axisName(leftAxis);visible: true;anchors.horizontalCenter:parent.left; anchors.verticalCenter:parent.verticalCenter;rotation: -90}
+    Text {text: axisName(bottomAxis);visible: true;anchors.bottom:parent.bottom; anchors.horizontalCenter:parent.horizontalCenter}
+    Text {text: axisName(rightAxis);visible: true;anchors.horizontalCenter:parent.right; anchors.verticalCenter:parent.verticalCenter;rotation: 90}
 
     // 标签
     Repeater {
@@ -58,5 +63,11 @@ Canvas {
         }
     }
 
-
+    function axisName(axis) {
+        if (axis) {
+            return axis.unit?axis.name + "[" + axis.unit + "]" : axis.name
+        } else {
+            return ""
+        }
+    }
 }

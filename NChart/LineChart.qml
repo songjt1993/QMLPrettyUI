@@ -5,15 +5,45 @@ import "lineseries.js" as LineSeries
 
 Rectangle {
     id: root
-    property var padding: {"top":20, "left":20, "bottom": 20, "right": 20}
+    property var padding: {"top":50, "left":20, "bottom": 20, "right": 100}
 //    property var series: []
     property var series: new Object()
     property alias plotArea: coordinate.plotArea
+    property var showLegend: true
+    property var showStatistics: false
     width: 1000
     height: 300
 
     ObjectModel {
         id: seriesModel
+    }
+
+    Text {
+        anchors.top: parent.top
+        anchors.topMargin: 5
+        anchors.horizontalCenter: parent.horizontalCenter
+        id: title
+        text: "哈哈哈"
+    }
+
+    Legend {
+        id: legend
+        visible: showLegend
+        anchors.right: parent.right
+        anchors.left: coordinate.right
+        anchors.top: coordinate.top
+        anchors.bottom: coordinate.bottom
+        onRightButtonPressed: {root.showLegend = false; showStatistics = true}
+    }
+
+    Statistics {
+        id: statistics
+        visible: showStatistics
+        anchors.right: parent.right
+        anchors.left: coordinate.right
+        anchors.top: coordinate.top
+        anchors.bottom: coordinate.bottom
+        onRightButtonPressed: {root.showLegend = true; showStatistics = false}
     }
 
     Coordinate {
@@ -31,7 +61,6 @@ Rectangle {
     Component.onCompleted: {
 //        coordinate.bottomAxis = createValueAxis("bottom", plotArea)
 //        coordinate.leftAxis = createValueAxis("left", plotArea)
-//        addSeries("bottomAxis", "leftAxis", "aa")
     }
 
     function createValueAxis(alignment) {
@@ -48,19 +77,32 @@ Rectangle {
         s.name = name
         var component = Qt.createComponent("Series.qml")
         if (component.status == Component.Ready) {
-            var item = component.createObject(root,
-            {
+            var item = component.createObject(root,{
                 "obj": s,
                 "x": root.padding.left,
                 "y": root.padding.top,
                 "width":  root.width - root.padding.left - root.padding.right,
                 "height": root.height - root.padding.top - root.padding.bottom
-            }
-            )
+            })
             seriesModel.insert(0, item)
+            // 添加legend
+            legend.addLegend({
+                "lineType": "solidLine",
+                "_color": s.color,
+                "name": s.name,
+            })
         } else {
             console.log("fail to create " + series)
         }
+    }
+
+    function updateStatistis(obj) {
+        statistics.update(obj)
+//        "unit": s.hAxis.unit,
+//        "realTime": 0,
+//        "average": 0,
+//        "min": 0,
+//        "max": 0
     }
 
     function addPoints(name, points) {

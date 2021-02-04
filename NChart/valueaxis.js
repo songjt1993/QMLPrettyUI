@@ -1,4 +1,6 @@
 function ValueAxis(alignment) {
+    this.name = alignment
+    this.unit = "%"
     this.alignment = alignment
     this.color = "black"
     this.lineWidth = 1
