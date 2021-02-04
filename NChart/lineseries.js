@@ -2,7 +2,7 @@ function LineSeries() {
     this.color = color()
     this.name = "line"
     this.lineWidth = 1
-    this.points = [Qt.point(0, 0), Qt.point(100, 200), Qt.point(400, 300), Qt.point(900, 100)]
+    this.points = []
     this.hAxis = null
     this.vAxis = null
 }
