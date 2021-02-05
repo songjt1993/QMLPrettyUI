@@ -4,7 +4,11 @@ import "utils.js" as Utils
 
 Rectangle {
     id: root
-    property var xAxis
+    required property var seriesModel
+    required property var hAxis
+    required property var vAxis
+    required property var hOffset
+    required property var vOffset
     color: "#00000000"
     clip: true
     width: 800
@@ -73,7 +77,7 @@ Rectangle {
         onClicked: {
             static.visible = true
             static.x = mouse.x
-            static.update({"time": 6, "fps": 60})
+            static.update(root.getData(mouse.x+hOffset))
             if (mouse.x > root.width * 0.75)
                 static.direction = false
             else
@@ -102,7 +106,7 @@ Rectangle {
                 }
             } else {
                 dynamic.x = mouse.x
-                dynamic.update({"time": 6, "fps": 60})
+                dynamic.update(root.getData(mouse.x+hOffset))
                 if (mouse.x > root.width * 0.75)
                     dynamic.direction = false
                 else
@@ -122,5 +126,18 @@ Rectangle {
             var item = elementModel.get(i)
             if (item.elementID == _id) return item
         }
+    }
+
+    function getData(pos) {
+        var x = hAxis.mapToValue(pos)
+        var result = {}
+        result[hAxis.name] = x.toFixed(2)
+        for (var i=0; i<seriesModel.count; i++) {
+            var series = seriesModel.get(i).obj
+            var index = Utils.findNearest(x, series.points)
+            if (series.points.length > index + 1 )
+                result[series.name] = series.points[index].y.toString()
+        }
+        return result
     }
 }

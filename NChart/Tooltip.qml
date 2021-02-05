@@ -7,7 +7,7 @@ Canvas {
     required property var elementID
     property var direction: true
     property var halfW: 0.5
-    property var textColor: "Blue"
+    property var textColor: "blue"//"#CCFF66"
     onPaint: {
         var ctx = getContext("2d")
         ctx.clearRect(0, 0, width, height)

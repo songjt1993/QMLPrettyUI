@@ -4,7 +4,7 @@ Rectangle {
     id: root
     signal tagUpdated(string contant)
     required property var elementID
-    property var tagColor: "#56ad7c"
+    property var tagColor: "#6666FF"
     property alias text: label.text
     property alias finish: labeledit.focus
     height: parent.height

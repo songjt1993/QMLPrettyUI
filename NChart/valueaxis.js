@@ -79,6 +79,10 @@ ValueAxis.prototype.mapToPosition = function(v) {
     return v * this.factor[0] + this.factor[1]
 }
 
+ValueAxis.prototype.mapToValue = function(pos) {
+    return (pos - this.factor[1]) / this.factor[0]
+}
+
 function drawTopAxis(axis, ctx, plotArea) {
     if (axis) {
         // 绘制坐标轴

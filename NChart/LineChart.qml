@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQml.Models 2.1
 import "valueaxis.js" as ValueAxis
 import "lineseries.js" as LineSeries
+import "utils.js" as Utils
 
 Rectangle {
     id: root
@@ -59,6 +60,11 @@ Rectangle {
     }
 
     ElementLayer {
+        seriesModel: seriesModel
+        hAxis: coordinate.bottomAxis
+        vAxis: coordinate.leftAxis
+        hOffset: plotArea.left
+        vOffset: plotArea.top
         anchors.left: coordinate.left
         anchors.leftMargin: plotArea.left
         anchors.top: coordinate.top
