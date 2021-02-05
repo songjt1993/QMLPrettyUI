@@ -11,19 +11,19 @@ Rectangle {
         Column {
             Text {
                 color: _color
-                text: "  latest: "+realTime+unit
+                text: "  latest: "+realTime.toFixed(2)+unit
             }
             Text {
                 color: _color
-                text: "  average: "+average+unit
+                text: "  average: "+average.toFixed(2)+unit
             }
             Text {
                 color: _color
-                text: "  minimum: "+min+unit
+                text: "  minimum: "+min.toFixed(2)+unit
             }
             Text {
                 color: _color
-                text: "  maximum: "+max+unit
+                text: "  maximum: "+max.toFixed(2)+unit
             }
         }
     }
@@ -54,7 +54,7 @@ Rectangle {
 
     function update(obj) {
         for (var i=0; i<statisticsModel.count; i++){
-            if (statisticsModel.get(i).name = obj.name) {
+            if (statisticsModel.get(i).name == obj.name) {
                 statisticsModel.set(i, obj)
                 return
             }

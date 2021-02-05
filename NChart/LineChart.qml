@@ -6,7 +6,7 @@ import "utils.js" as Utils
 
 Rectangle {
     id: root
-    property var padding: {"top":50, "left":20, "bottom": 20, "right": 100}
+    property var padding: {"top":50, "left":20, "bottom": 20, "right": 200}
 //    property var series: []
     property var series: new Object()
     property alias plotArea: coordinate.plotArea
@@ -107,18 +107,18 @@ Rectangle {
                 "_color": s.color,
                 "name": s.name,
             })
+            // 添加statistic
+            statistics.update({
+                "_color": s.color,
+                "name": s.name,
+            })
         } else {
             console.log("fail to create " + series)
         }
     }
 
-    function updateStatistis(obj) {
+    function updateStatistic(obj) {
         statistics.update(obj)
-//        "unit": s.hAxis.unit,
-//        "realTime": 0,
-//        "average": 0,
-//        "min": 0,
-//        "max": 0
     }
 
     function addPoints(name, points) {
