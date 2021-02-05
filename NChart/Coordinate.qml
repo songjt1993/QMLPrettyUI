@@ -9,6 +9,7 @@ Canvas {
     property var rightAxis: null
     onPaint: {
         var ctx = getContext("2d")
+        ctx.clearRect(0,0,width,height)
         if (topAxis) topAxis.draw(ctx, plotArea)
         if (bottomAxis) bottomAxis.draw(ctx, plotArea)
         if (leftAxis) leftAxis.draw(ctx, plotArea)
@@ -69,5 +70,13 @@ Canvas {
         } else {
             return ""
         }
+    }
+
+    function rePaint() {
+        markDirty(Qt.rect(0, 0, width, height))
+        topLabel.model = topAxis?topAxis.tick.marks:[]
+        leftLabel.model = leftAxis?leftAxis.tick.marks:[]
+        bottomLabel.model = bottomAxis?bottomAxis.tick.marks:[]
+        rightLabel.model = rightAxis?rightAxis.tick.marks:[]
     }
 }

@@ -7,7 +7,6 @@ import "utils.js" as Utils
 Rectangle {
     id: root
     property var padding: {"top":50, "left":20, "bottom": 20, "right": 200}
-//    property var series: []
     property var series: new Object()
     property alias plotArea: coordinate.plotArea
     property var showLegend: true
@@ -79,6 +78,31 @@ Rectangle {
 //        coordinate.leftAxis = createValueAxis("left", plotArea)
     }
 
+    onPlotAreaChanged: {
+        for (var alignment of ["top", "bottom", "left", "right"]) {
+            var axis = coordinate[alignment+"Axis"]
+            if (axis) {
+                changeAxisRange(alignment, axis.range[0], axis.range[1])
+            }
+        }
+    }
+
+    function changeAxisRange(alignment, min, max) {
+        var axis = coordinate[alignment+"Axis"]
+        axis.range = [min, max]
+        axis.calFactor(axis.range[0], axis.range[1], root.plotArea)
+        axis.adjust()
+        rePaint()
+    }
+
+    function rePaint() {
+        coordinate.rePaint()
+        for (var i=0; i<seriesModel.count; i++){
+            var cvs = seriesModel.get(i)
+            cvs.markDirty(Qt.rect(0, 0, cvs.width, cvs.height))
+        }
+    }
+
     function createValueAxis(alignment) {
         var axis = new ValueAxis.ValueAxis(alignment)
         axis.calFactor(axis.range[0], axis.range[1], root.plotArea)
@@ -95,10 +119,10 @@ Rectangle {
         if (component.status == Component.Ready) {
             var item = component.createObject(root,{
                 "obj": s,
-                "x": root.padding.left,
-                "y": root.padding.top,
-                "width":  root.width - root.padding.left - root.padding.right,
-                "height": root.height - root.padding.top - root.padding.bottom
+                "x": Qt.binding(function() {return root.padding.left}),
+                "y": Qt.binding(function() {return root.padding.top}),
+                "width":  Qt.binding(function() {return root.width - root.padding.left - root.padding.right}),
+                "height": Qt.binding(function() {return root.height - root.padding.top - root.padding.bottom})
             })
             seriesModel.insert(0, item)
             // 添加legend
@@ -122,7 +146,7 @@ Rectangle {
     }
 
     function addPoints(name, points) {
-        for (var i; i<seriesModel.count; i++){
+        for (var i=0; i<seriesModel.count; i++){
             var cvs = seriesModel.get(i)
             if (cvs.obj.name == name) {
                 cvs.obj.points.push.apply(cvs.obj.points, points)

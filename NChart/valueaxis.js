@@ -62,17 +62,18 @@ ValueAxis.prototype.adjust = function() {
     } else {
         firstTick = Math.ceil((this.range[0] - this.tick.strategy[0]) / realInterval) * realInterval + this.tick.strategy[0]
     }
-    this.tick.position = []
+    this.tick.marks = []
     var i = 0
-    var pos = null
-    do {
-        pos = firstTick + i * realInterval
+    var pos = firstTick + i * realInterval
+    while(pos < this.range[1]) {
         this.tick.marks.push({
             "label": this.format(pos),
             "position": this.mapToPosition(pos)
         })
         i++
-    } while(pos < this.range[1])
+        pos = firstTick + i * realInterval
+    }
+//    console.log(pos, this.tick.marks[i-1].label, this.tick.marks[i-1].position, this.range[1])
 }
 
 ValueAxis.prototype.mapToPosition = function(v) {
