@@ -60,7 +60,7 @@ Canvas {
     function update(obj) {
         tooltipModel.clear()
         for (var name in obj) {
-            tooltipModel.append({"name": name, "value": obj[name]})
+            tooltipModel.append({"name": name, "value": Number(obj[name]).toFixed(2)})
         }
     }
 }
