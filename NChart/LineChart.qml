@@ -58,6 +58,16 @@ Rectangle {
         model: seriesModel
     }
 
+    ElementLayer {
+        anchors.left: coordinate.left
+        anchors.leftMargin: plotArea.left
+        anchors.top: coordinate.top
+        anchors.topMargin: plotArea.top
+        width: plotArea.width
+        height: plotArea.height
+        z: 10
+    }
+
     Component.onCompleted: {
 //        coordinate.bottomAxis = createValueAxis("bottom", plotArea)
 //        coordinate.leftAxis = createValueAxis("left", plotArea)

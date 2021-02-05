@@ -61,7 +61,7 @@ Rectangle {
                 var component = Qt.createComponent("Tag.qml")
                 if (component.status == Component.Ready) {
                     var item = component.createObject(root, {"elementID": Utils.uuid()})
-                    item.width = 2
+                    item.width = 1
                     item.x = mouse.x
                     item.z = 21
                     elementModel.append(item)
@@ -81,6 +81,9 @@ Rectangle {
         }
         onPositionChanged: {
             if (startPos) {
+                // 为了防止误操作
+                if (Math.abs(startPos.x - mouse.x) < 10)
+                    return
                 if (currentElement) {
                     currentElement.width = mouse.x - startPos.x
                     currentElement.x = startPos.x

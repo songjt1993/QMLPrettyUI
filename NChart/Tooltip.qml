@@ -6,7 +6,7 @@ Canvas {
     id: root
     required property var elementID
     property var direction: true
-    property var halfW: 1
+    property var halfW: 0.5
     property var textColor: "Blue"
     onPaint: {
         var ctx = getContext("2d")
