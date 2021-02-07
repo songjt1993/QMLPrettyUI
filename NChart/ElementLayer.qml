@@ -4,6 +4,7 @@ import "utils.js" as Utils
 
 Rectangle {
     id: root
+    signal toolTipMoved(var p)
     required property var seriesModel
     required property var hAxis
     required property var vAxis
@@ -16,6 +17,7 @@ Rectangle {
 
     Tooltip {
         id: static
+        objectName: "staticTooltip"
         elementID: Utils.uuid()
         visible: false
         width: root.width/4
@@ -62,13 +64,13 @@ Rectangle {
         }
         onPressAndHold: {
             if (startPos.x == mouse.x && startPos.y == mouse.y) {
-                createElement(mouse.x, 1)
+                createElement(mapToValue(startPos.x), mapToValue(startPos.x))
             }
         }
         onClicked: {
             static.visible = true
-            static.value = hAxis.mapToValue(mouse.x + hOffset)
-            moveTooltip(static, mouse.x)
+            moveTooltip(static, mapToValue(mouse.x))
+            toolTipMoved(static.value)
         }
         onPositionChanged: {
             if (startPos) {
@@ -76,15 +78,13 @@ Rectangle {
                 if (Math.abs(startPos.x - mouse.x) < 10)
                     return
                 if (currentElement) {
-                    currentElement.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(mouse.x + hOffset)]
-                    moveElement(currentElement, startPos.x, mouse.x - startPos.x)
+                    moveElement(currentElement, mapToValue(startPos.x), mapToValue(mouse.x))
                 } else {
-                    if (createElement(mouse.x, mouse.x - startPos.x))
+                    if (createElement(mapToValue(startPos.x), mapToValue(mouse.x)))
                         currentElement = elementModel.get(elementModel.count-1)
                 }
             } else {
-                dynamic.value = hAxis.mapToValue(mouse.x + hOffset)
-                moveTooltip(dynamic, mouse.x)
+                moveTooltip(dynamic, mapToValue(mouse.x))
             }
         }
         onEntered: {
@@ -95,15 +95,14 @@ Rectangle {
         }
     }
 
-    function createElement(mousePos, elWidth) {
+    function createElement(v_min, v_max) {
         var component = Qt.createComponent("Tag.qml")
         if (component.status == Component.Ready) {
             var item = component.createObject(root, {"elementID": Utils.uuid()})
-            item.range = [hAxis.mapToValue(mousePos + hOffset), hAxis.mapToValue(mousePos + hOffset)]
-            moveElement(item, mousePos, elWidth)
+            moveElement(item, v_min, v_max)
             item.z = 21
             elementModel.append(item)
-            return item.elementID
+            return item
         } else {
             console.log("fail to create tag")
             return null
@@ -117,13 +116,16 @@ Rectangle {
         }
     }
 
-    function moveElement(el, pos, elWidth) {
-        el.width = elWidth
-        el.x = pos
+    function moveElement(el, v_min, v_max) {
+        el.range = [v_min, v_max]
+        el.x = mapToPosition(v_min)
+        if (v_min == v_max)
+            el.width = 1
+        else
+            el.width = mapToPosition(v_max) - el.x
     }
 
-    function getData(pos) {
-        var x = hAxis.mapToValue(pos)
+    function getData(x) {
         var result = {}
         result[hAxis.name] = x.toFixed(2)
         for (var i=0; i<seriesModel.count; i++) {
@@ -136,23 +138,28 @@ Rectangle {
     }
 
     function rePaint() {
-        if (static.value) moveTooltip(static, hAxis.mapToPosition(static.value) - hOffset)
+        if (static.value) moveTooltip(static, static.value)
         for (var i=0; i<elementModel.count; i++) {
             var element = elementModel.get(i)
-            var pos = hAxis.mapToPosition(element.range[0]) - hOffset
-            if (element.range[0] == element.range[1])
-                moveElement(element, pos, 1)
-            else
-                moveElement(element, pos, hAxis.mapToPosition(element.range[1]) - hOffset - pos)
+            moveElement(element, element.range[0], element.range[1])
         }
     }
 
-    function moveTooltip(tp, pos) {
-        tp.x = pos
-        tp.update(root.getData(pos+hOffset))
-        if (pos > root.width * 0.75)
+    function moveTooltip(tp, value) {
+        tp.value = value
+        tp.x = mapToPosition(value)
+        tp.update(root.getData(value))
+        if (tp.x > root.width * 0.75)
             tp.direction = false
         else
             tp.direction = true
+    }
+
+    function mapToValue(pos) {
+        return hAxis.mapToValue(pos + hOffset)
+    }
+
+    function mapToPosition(value) {
+        return hAxis.mapToPosition(value) - hOffset
     }
 }

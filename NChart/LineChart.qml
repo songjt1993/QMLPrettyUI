@@ -6,12 +6,13 @@ import "utils.js" as Utils
 
 Rectangle {
     id: root
+    signal staticTooltipMoved(var p)
     property var padding: {"top":50, "left":20, "bottom": 20, "right": 200}
     property var series: new Object()
     property alias plotArea: coordinate.plotArea
     property var showLegend: true
     property var showStatistics: false
-    width: 1000
+    width: 1300
     height: 300
 
     ObjectModel {
@@ -60,6 +61,7 @@ Rectangle {
 
     ElementLayer {
         id: elements
+        objectName: "ElementLayer"
         seriesModel: seriesModel
         hAxis: coordinate.bottomAxis
         vAxis: coordinate.leftAxis
