@@ -62,16 +62,7 @@ Rectangle {
         }
         onPressAndHold: {
             if (startPos.x == mouse.x && startPos.y == mouse.y) {
-                var component = Qt.createComponent("Tag.qml")
-                if (component.status == Component.Ready) {
-                    var item = component.createObject(root, {"elementID": Utils.uuid()})
-                    item.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(startPos.x + hOffset)]
-                    moveElement(item, startPos.x, 1)
-                    item.z = 21
-                    elementModel.append(item)
-                } else {
-                    console.log("fail to create tag")
-                }
+                createElement(mouse.x, 1)
             }
         }
         onClicked: {
@@ -88,17 +79,8 @@ Rectangle {
                     currentElement.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(mouse.x + hOffset)]
                     moveElement(currentElement, startPos.x, mouse.x - startPos.x)
                 } else {
-                    var component = Qt.createComponent("Tag.qml")
-                    if (component.status == Component.Ready) {
-                        var item = component.createObject(root, {"elementID": Utils.uuid()})
-                        item.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(mouse.x + hOffset)]
-                        item.z = 21
-                        moveElement(item, startPos.x, mouse.x - startPos.x)
-                        elementModel.append(item)
-                        currentElement = item
-                    } else {
-                        console.log("fail to create tag")
-                    }
+                    if (createElement(mouse.x, mouse.x - startPos.x))
+                        currentElement = elementModel.get(elementModel.count-1)
                 }
             } else {
                 dynamic.value = hAxis.mapToValue(mouse.x + hOffset)
@@ -113,11 +95,31 @@ Rectangle {
         }
     }
 
+    function createElement(mousePos, elWidth) {
+        var component = Qt.createComponent("Tag.qml")
+        if (component.status == Component.Ready) {
+            var item = component.createObject(root, {"elementID": Utils.uuid()})
+            item.range = [hAxis.mapToValue(mousePos + hOffset), hAxis.mapToValue(mousePos + hOffset)]
+            moveElement(item, mousePos, elWidth)
+            item.z = 21
+            elementModel.append(item)
+            return item.elementID
+        } else {
+            console.log("fail to create tag")
+            return null
+        }
+    }
+
     function getElement(_id) {
         for (var i=0; i<elementModel.count; i++) {
             var item = elementModel.get(i)
             if (item.elementID == _id) return item
         }
+    }
+
+    function moveElement(el, pos, elWidth) {
+        el.width = elWidth
+        el.x = pos
     }
 
     function getData(pos) {
@@ -143,11 +145,6 @@ Rectangle {
             else
                 moveElement(element, pos, hAxis.mapToPosition(element.range[1]) - hOffset - pos)
         }
-    }
-
-    function moveElement(el, pos, width) {
-        el.width = width
-        el.x = pos
     }
 
     function moveTooltip(tp, pos) {
