@@ -65,8 +65,8 @@ Rectangle {
                 var component = Qt.createComponent("Tag.qml")
                 if (component.status == Component.Ready) {
                     var item = component.createObject(root, {"elementID": Utils.uuid()})
-                    item.width = 1
-                    item.x = mouse.x
+                    item.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(startPos.x + hOffset)]
+                    moveElement(item, startPos.x, 1)
                     item.z = 21
                     elementModel.append(item)
                 } else {
@@ -76,12 +76,8 @@ Rectangle {
         }
         onClicked: {
             static.visible = true
-            static.x = mouse.x
-            static.update(root.getData(mouse.x+hOffset))
-            if (mouse.x > root.width * 0.75)
-                static.direction = false
-            else
-                static.direction = true
+            static.value = hAxis.mapToValue(mouse.x + hOffset)
+            moveTooltip(static, mouse.x)
         }
         onPositionChanged: {
             if (startPos) {
@@ -89,15 +85,15 @@ Rectangle {
                 if (Math.abs(startPos.x - mouse.x) < 10)
                     return
                 if (currentElement) {
-                    currentElement.width = mouse.x - startPos.x
-                    currentElement.x = startPos.x
+                    currentElement.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(mouse.x + hOffset)]
+                    moveElement(currentElement, startPos.x, mouse.x - startPos.x)
                 } else {
                     var component = Qt.createComponent("Tag.qml")
                     if (component.status == Component.Ready) {
                         var item = component.createObject(root, {"elementID": Utils.uuid()})
-                        item.width = mouse.x - startPos.x
-                        item.x = startPos.x
+                        item.range = [hAxis.mapToValue(startPos.x + hOffset), hAxis.mapToValue(mouse.x + hOffset)]
                         item.z = 21
+                        moveElement(item, startPos.x, mouse.x - startPos.x)
                         elementModel.append(item)
                         currentElement = item
                     } else {
@@ -105,12 +101,8 @@ Rectangle {
                     }
                 }
             } else {
-                dynamic.x = mouse.x
-                dynamic.update(root.getData(mouse.x+hOffset))
-                if (mouse.x > root.width * 0.75)
-                    dynamic.direction = false
-                else
-                    dynamic.direction = true
+                dynamic.value = hAxis.mapToValue(mouse.x + hOffset)
+                moveTooltip(dynamic, mouse.x)
             }
         }
         onEntered: {
@@ -139,5 +131,31 @@ Rectangle {
                 result[series.name] = series.points[index].y.toString()
         }
         return result
+    }
+
+    function rePaint() {
+        if (static.value) moveTooltip(static, hAxis.mapToPosition(static.value) - hOffset)
+        for (var i=0; i<elementModel.count; i++) {
+            var element = elementModel.get(i)
+            var pos = hAxis.mapToPosition(element.range[0]) - hOffset
+            if (element.range[0] == element.range[1])
+                moveElement(element, pos, 1)
+            else
+                moveElement(element, pos, hAxis.mapToPosition(element.range[1]) - hOffset - pos)
+        }
+    }
+
+    function moveElement(el, pos, width) {
+        el.width = width
+        el.x = pos
+    }
+
+    function moveTooltip(tp, pos) {
+        tp.x = pos
+        tp.update(root.getData(pos+hOffset))
+        if (pos > root.width * 0.75)
+            tp.direction = false
+        else
+            tp.direction = true
     }
 }

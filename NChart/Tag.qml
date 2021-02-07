@@ -7,6 +7,7 @@ Rectangle {
     property var tagColor: "#6666FF"
     property alias text: label.text
     property alias finish: labeledit.focus
+    property var range
     height: parent.height
     border.width: 1
     border.color: tagColor

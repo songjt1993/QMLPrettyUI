@@ -59,6 +59,7 @@ Rectangle {
     }
 
     ElementLayer {
+        id: elements
         seriesModel: seriesModel
         hAxis: coordinate.bottomAxis
         vAxis: coordinate.leftAxis
@@ -97,6 +98,7 @@ Rectangle {
 
     function rePaint() {
         coordinate.rePaint()
+        elements.rePaint()
         for (var i=0; i<seriesModel.count; i++){
             var cvs = seriesModel.get(i)
             cvs.markDirty(Qt.rect(0, 0, cvs.width, cvs.height))
