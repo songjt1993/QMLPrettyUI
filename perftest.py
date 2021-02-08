@@ -106,7 +106,7 @@ class DownSampling(object):
 
 
 class QMLLineChart(QQuickWidget):
-    TOOLTIP_MOVED = pyqtSignal(QVariant)
+    TOOLTIP_MOVED = pyqtSignal(QVariant, QVariant)
     REQUEST_MODIFY_SCENE = pyqtSignal(str)
 
     def __init__(self, title="", parent=None):
@@ -146,7 +146,7 @@ class QMLLineChart(QQuickWidget):
         self.rootObject().addSeries("bottom", "left", name)
         self.points[name] = {
             "points": [],
-            "down_sampling": self.set_down_sampling(3, 3)
+            "down_sampling": self.set_down_sampling(2, 3)
         }
         self.statistics[name] = {
             "name": name,
@@ -218,15 +218,17 @@ class QMLLineChart(QQuickWidget):
         item = self._element_layer.getElement(QVariant(_id))
         item.setProperty("text", text)
 
-    def move_tooltip(self, value):
-        self._element_layer.moveTooltip(QVariant(value))
+    def move_tooltip(self, obj_name, value):
+        tooltip = self._element_layer.findChild(QQuickItem, name=obj_name)
+        tooltip.setProperty("visible", True)
+        self._element_layer.moveTooltip(tooltip, QVariant(value))
 
 
 CHARTS = []
-init_cnt = 100
+init_cnt = 6000
 total = init_cnt // 2 * 3
-r = 1
-c = 1
+r = 5
+c = 2
 
 def generate_points(n, x_range, y_range):
     points = []
@@ -265,6 +267,11 @@ def set_range(v):
     for wgt in CHARTS:
         wgt.set_xrange(0, v/100*1000)
 
+def move_tooltip(name, value):
+    for c in CHARTS:
+        c.move_tooltip(name, value)
+
+
 
 if __name__ == "__main__":
     app = QApplication([])
@@ -293,4 +300,5 @@ if __name__ == "__main__":
     _id = CHARTS[0].add_scene(300, 400)
     CHARTS[0].update_scene(_id, "hahahah")
     CHARTS[0].REQUEST_MODIFY_SCENE.connect(print)
+    CHARTS[0].TOOLTIP_MOVED.connect(move_tooltip)
     app.exec_()
