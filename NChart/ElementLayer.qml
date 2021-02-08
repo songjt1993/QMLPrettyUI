@@ -4,7 +4,7 @@ import "utils.js" as Utils
 
 Rectangle {
     id: root
-    signal toolTipMoved(var p)
+    signal toolTipMoved(var which, var value)
     required property var seriesModel
     required property var hAxis
     required property var vAxis
@@ -28,6 +28,7 @@ Rectangle {
 
     Tooltip {
         id: dynamic
+        objectName: "dynamicTooltip"
         elementID: Utils.uuid()
         visible: false
         width: root.width/4
@@ -70,7 +71,7 @@ Rectangle {
         onClicked: {
             static.visible = true
             moveTooltip(static, mapToValue(mouse.x))
-            toolTipMoved(static.value)
+            toolTipMoved(static.objectName, static.value)
         }
         onPositionChanged: {
             if (startPos) {
@@ -85,6 +86,7 @@ Rectangle {
                 }
             } else {
                 moveTooltip(dynamic, mapToValue(mouse.x))
+                toolTipMoved(dynamic.objectName, dynamic.value)
             }
         }
         onEntered: {
